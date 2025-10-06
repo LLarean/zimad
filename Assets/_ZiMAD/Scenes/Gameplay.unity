@@ -207,7 +207,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 5840904908304155363, guid: cd5aee6dbe9012d4bb69bc76349b7d97, type: 3}
+  m_Sprite: {fileID: 5840904908304155363, guid: 94380c959fc4e6d41938a2ac5a07223f, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -392,8 +392,8 @@ RectTransform:
   - {fileID: 803191865}
   - {fileID: 1103316468}
   - {fileID: 255899550}
-  - {fileID: 807608350}
   - {fileID: 366796677}
+  - {fileID: 807608350}
   m_Father: {fileID: 886784641}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1114,7 +1114,7 @@ Camera:
   m_GameObject: {fileID: 1739320375}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2

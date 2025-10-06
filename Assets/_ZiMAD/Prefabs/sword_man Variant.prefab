@@ -99,3 +99,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerController: {fileID: 386362136792893990}
+  _animator: {fileID: 8601179920216728672}
+--- !u!95 &8601179920216728672 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: -6074401949650919683, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+  m_PrefabInstance: {fileID: 6696540441533250205}
+  m_PrefabAsset: {fileID: 0}
