@@ -35,11 +35,11 @@ This project is a technical implementation of a 2D game prototype with optimized
 *Responsive UI adapting to different screen sizes*
 
 ### Animation
-![Animator](https://github.com/LLarean/zimad/blob/main/Screenshots/Animator.jpg?raw=true)
+![Animator](https://github.com/LLarean/zimad/blob/main/Screenshots/Animator.jpg?raw=true)  
 *Character animation*
 
 ### Optimization Results
-![FrameDebugger](https://github.com/LLarean/zimad/blob/main/Screenshots/FrameDebugger.jpg?raw=true)
+![FrameDebugger](https://github.com/LLarean/zimad/blob/main/Screenshots/FrameDebugger.png?raw=true)  
 *Draw calls optimization showcase*
 
 ---
