@@ -30,11 +30,5 @@
         private void MoveBack() => _playerController.MoveBack();
 
         private void StopMoving() => _playerController.StopMoving();
-
-        private void Spawn()
-        {
-            _playerController.CreateFX("AttackEffect");
-        }
-        
     }
 }

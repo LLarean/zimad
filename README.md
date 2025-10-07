@@ -141,8 +141,7 @@ Shape: Circle with radial spread
 // Animation Event calls this method
 private void OnAttackHit()
 {
-    ParticleSystem fx = Instantiate(attackFX, hitPosition, Quaternion.identity);
-    Destroy(fx.gameObject, 1f);
+    _playerController.CreateFX("AttackEffect");
 }
 ```
 
