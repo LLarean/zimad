@@ -50,8 +50,8 @@
       <p align="center"><em>Character Animator State Machine</em></p>
     </td>
     <td width="50%">
-      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/FrameDebugger.png?raw=true" alt="Draw Calls"/>
-      <p align="center"><em>Frame Debugger: 6 Draw Calls Total</em></p>
+      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/DrawCalls.png?raw=true" alt="Draw Calls"/>
+      <p align="center"><em>Frame Debugger</em></p>
     </td>
   </tr>
 </table>
@@ -238,6 +238,67 @@ This is a **hardware-level GPU operation** and cannot be batched. Alternative so
 
 ---
 
+### Sprite Atlas Optimization (Level & Character)
+
+**Location Atlas Configuration:**
+```
+General Settings:
+├─ Include in Build: ON
+├─ Allow Rotation: ON
+├─ Tight Packing: ON
+└─ Padding: 4 pixels
+
+Platform Settings (Default):
+├─ Max Texture Size: 4096
+├─ Format: Automatic (Compressed)
+├─ Compression: Normal Quality
+└─ Crunch Compression: Quality 50
+```
+
+**Character Atlas Configuration:**
+```
+General Settings:
+├─ Include in Build: ON
+├─ Allow Rotation: ON
+├─ Tight Packing: ON
+└─ Padding: 4 pixels
+
+Platform Settings (Default):
+├─ Max Texture Size: 256
+├─ Format: Automatic (Compressed)
+├─ Compression: High Quality (character priority)
+└─ Crunch Compression: Quality 75
+```
+
+**Optimization Results:**
+- **Before**: 15-18 separate textures, ~12 MB memory, 15-20 draw calls
+- **After**: 2 sprite atlases, ~350 KB memory, **3 draw calls** 
+
+**Design Decision: 3 Draw Calls for Gameplay**
+
+The gameplay level uses 3 draw calls due to **Sorting Order** requirements:
+
+```
+Layer 0 (Ground): Sorting Order 0  → 1 draw call (Location Atlas)
+Layer 1 (Knight): Sorting Order 10 → 1 draw call (Character Atlas)
+Layer 2 (Grass):  Sorting Order 20 → 1 draw call (Location Atlas)
+```
+
+**Why 3 instead of 2?**
+- Grass must render **above** knight's legs for correct depth
+- Different Sorting Orders prevent batching (Unity limitation)
+- Alternative (Sprite Mask) would add +2 draw calls (worse: 2→4)
+
+**Trade-off Analysis:**
+- ✅ Correct visual depth layering (grass over legs)
+- ✅ Simple, maintainable scene hierarchy
+- ✅ No complex Z-position management
+- ❌ +1 draw call vs theoretical minimum
+
+**Conclusion:** 3 draw calls is the optimal balance between performance and visual correctness. Reducing to 2 would sacrifice depth realism or require more expensive solutions (masks, custom shaders).
+
+---
+
 ### 6. Code Architecture Decisions
 
 #### Why `Update()` for IdleAttack instead of Coroutine?
@@ -326,11 +387,12 @@ git clone https://github.com/LLarean/zimad.git
 
 ## Performance Results (UI)
 
-| Metric        | Target | Achieved    |
-|-------------------|--------|-------------|
-| Draw Calls    | < 15   | **6**       |
-| Batches       | < 20   | **6**       |
-| Sprite Atlas Size | - | **2.2 KB**  |
+| Metric                   | Target | Achieved    |
+|--------------------------|--------|-------------|
+| Draw Calls (UI)          | < 15   | **6**       |
+| Draw Calls (Game)        | < 15   | **3**       |
+| Sprite Atlas Size (UI)   | - | **2.2 KB**  |
+| Sprite Atlas Size (Game) | - | **~350 KB** |
 
 **Test Environment:** Unity 6000.0.58, Built-in Pipeline, 1920x1080
 
