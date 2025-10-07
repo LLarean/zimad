@@ -786,6 +786,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: location
       objectReference: {fileID: 0}
+    - target: {fileID: 1441855095775677317, guid: f2fe8fed95870a6488a44d984c75e1c2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7766548329847303702, guid: f2fe8fed95870a6488a44d984c75e1c2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -112.3
@@ -1512,6 +1516,10 @@ PrefabInstance:
     - target: {fileID: 6695289051498833287, guid: 3a1aa4432d8718a4085242aa44e2bef7, type: 3}
       propertyPath: m_Name
       value: sword_man
+      objectReference: {fileID: 0}
+    - target: {fileID: 6695289051498833287, guid: 3a1aa4432d8718a4085242aa44e2bef7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
