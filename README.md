@@ -22,7 +22,7 @@
 ![Gameplay Demo](https://github.com/LLarean/zimad/blob/main/Screenshots/Movie_004.gif?raw=true)
 
 ### WebGL Build
-[Play in Browser](#) *(coming soon)*
+[Play in Browser](https://llarean.github.io/zimad-webgl-demo/)
 
 **System Requirements:**
 - Modern browser with WebGL support
