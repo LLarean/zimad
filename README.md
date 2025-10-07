@@ -6,13 +6,15 @@
 
 > **Note:** Graphic assets provided by ZiMAD. Code implementation and optimization by author.
 
+---
+
 ## Assignment Requirements
 
-- [x] **UI Layout** - Implement responsive UI matching provided mockup with optimized sprite slicing for different screen ratios
-- [x] **Asset Optimization** - Minimize graphic resources size while maintaining visual quality
-- [x] **Character Animator** - Configure animator with `Run` (Bool) parameter and proper state transitions using PlayerController component
-- [x] **Weapon VFX** - Create self-destroying ground impact particle effect
-- [x] **Render Optimization** - Achieve minimal possible draw calls
+- [x] Responsive UI layout with optimized sprite slicing
+- [x] Minimized graphic resources while maintaining visual quality
+- [x] Character animator with proper state transitions
+- [x] Self-destroying weapon VFX effect
+- [x] Minimal draw calls optimization
 
 ---
 
@@ -24,11 +26,6 @@
 ### WebGL Build
 [Play in Browser](https://llarean.github.io/zimad-webgl-demo/)
 
-**System Requirements:**
-- Modern browser with WebGL support
-- Recommended: Chrome, Firefox, Edge
-- Stable internet connection
-
 ---
 
 ## Screenshots
@@ -36,22 +33,22 @@
 <table>
   <tr>
     <td width="50%">
-      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/Screenshot_428x926.jpg?raw=true" alt="428x926 Layout"/>
-      <p align="center"><em>428x926</em></p>
+      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/Screenshot_428x926.jpg?raw=true" alt="Mobile Layout"/>
+      <p align="center"><em>Mobile (428×926)</em></p>
     </td>
     <td width="50%">
-      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/Screenshot_3440x1440.jpg?raw=true" alt="3440x1440 Layout"/>
-      <p align="center"><em>3440x1440</em></p>
+      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/Screenshot_3440x1440.jpg?raw=true" alt="Ultrawide Layout"/>
+      <p align="center"><em>Ultrawide (3440×1440)</em></p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/Animator.jpg?raw=true" alt="Animator Setup"/>
-      <p align="center"><em>Character Animator State Machine</em></p>
+      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/Animator.jpg?raw=true" alt="Animator"/>
+      <p align="center"><em>Animation State Machine</em></p>
     </td>
     <td width="50%">
-      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/DrawCalls.jpg?raw=true" alt="Draw Calls"/>
-      <p align="center"><em>Frame Debugger</em></p>
+      <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/DrawCalls.jpg?raw=true" alt="Optimization"/>
+      <p align="center"><em>Frame Debugger (9 Draw Calls)</em></p>
     </td>
   </tr>
 </table>
@@ -60,312 +57,130 @@
 
 ## Technical Implementation
 
-### 1. UI Optimization & Responsive Layout
+### 1. UI Optimization
 
-**Sprite Optimization:**
-- Minimal base sprites: **16x16** and **32x32** pixels
-- 9-Slice scaling for borders and panels
-- Single **Sprite Atlas** with Crunch compression
+**Sprite Atlas:**
+- Base sprites: 16×16 and 32×32 pixels
+- 9-Slice scaling for scalable elements
+- Crunch compression for size reduction
 
-**Responsive Canvas:**
-```
-Canvas Scaler:
-├─ UI Scale Mode: Scale With Screen Size
-├─ Reference Resolution: 1920x1080
-└─ Match: 0.5 (balanced width/height)
-```
-
-**Layout Strategy:**
-- Anchor-based positioning (no hardcoded coordinates)
+**Responsive Layout:**
+- Anchor-based positioning (no hardcoded values)
 - Flexible containers adapt to screen aspect ratio
-- Tested on 16:9, 18:9, 19.5:9, 4:3 ratios
+- Tested: 4:3, 16:9, 18:9, 21:9 aspect ratios
 
-**Result:** UI scales correctly from iPhone SE to iPad Pro without breaking layout.
+**Result:** ~2.3 KB atlas, 6 draw calls
 
 ---
 
-### 2. Gameplay Rendering via RenderTexture
+### 2. Gameplay Rendering
 
-**Architecture:**
-```
-Gameplay Camera → RenderTexture (1024x1024)
-                       ↓
-                 RawImage (UI)
-                       ↓
-                  User sees game inside UI frame
-```
+**RenderTexture System:**
+- Gameplay camera renders to 1024×1024 texture
+- RawImage displays texture in UI
+- Isolated rendering layers (gameplay/UI)
 
 **Benefits:**
-- Gameplay isolated from UI layer (clean culling masks)
+- Clean layer separation
 - Easy masking with rounded corners
 - Independent resolution control
 
-**Camera Settings:**
-```
-Gameplay Camera:
-├─ Target Texture: GameplayWindow
-├─ Culling Mask: Everything except UI
-└─ Clear Flags: Solid Color
-
-RenderTexture:
-├─ Size: 1024x1024
-├─ Anti-aliasing: none
-└─ Filter Mode: Bilinear
-```
-
 ---
 
-### 3. Character Animation System
-
-**Animator Controller:**
+### 3. Character Animation
 
 **States:**
-- `Idle` - Standing still (default state)
-- `Run` - Movement animation
-- `Attack` - Periodic attack during idle
-
-**Parameters:**
-- `Run` (Bool) - Movement flag for PlayerController
-- `IdleAttack` (Trigger) - Random idle attack
+- `Idle` - Default state
+- `Run` - Movement (triggered by position change)
+- `IdleAttack` - Random attack (2-5 sec intervals)
 
 **Transitions:**
-```
-Idle ⟷ Run:
-├─ Condition: _lastPosition != transform.position
-├─ Has Exit Time: OFF (instant response)
-├─ Transition Duration: 0.25s
-└─ Interruption Source: Current State
-
-Idle → IdleAttack:
-├─ Condition: IdleAttack trigger (random 2-5s)
-├─ Has Exit Time: OFF
-└─ Transition Duration: 0.25s
-
-IdleAttack → Idle:
-├─ Has Exit Time: ON (play full animation)
-├─ Exit Time: 0.57
-└─ Transition Duration: 0.25s
-```
-
-**Integration with PlayerController:**
-```csharp
-_playerController.MoveForward();
-_playerController.MoveBack();
-_playerController.StopMoving();
-_playerController.CreateFX("AttackEffect");
-```
+- Fast response: Has Exit Time OFF, Duration 0.25s
+- Smooth blending between states
+- Animation Events for frame-perfect VFX timing
 
 ---
 
-### 4. Weapon Hit VFX System
+### 4. Weapon VFX
 
-**Particle System Configuration:**
-```
-Main Module:
-├─ Duration: 0.3s
-├─ Start Lifetime: 0.15-0.25s
-├─ Start Speed: 0.7-1
-├─ Max Particles: 20
-├─ Play On Awake: OFF
-└─ Stop Action: Destroy
-
-Emission:
-├─ Rate over Time: 20
-└─ Rate over Distance: 0
-
-Shape:
-├─ Shape: Circle
-└─ Radius: 0.2
-
-Size over Lifetime:
-└─ Curve: 0.5 → 0.9
-
-Color over Lifetime:
-└─ Alpha: 255 → 200 → 0 (fade out)
-
-Rederer:
-└─ Material: AttackEffect
-```
-
-**Spawning via Animation Event:**
-```csharp
-// Animation Event at attack frame 15
-private void OnAttackHit()
-{
-    _playerController.CreateFX("AttackEffect");
-}
-```
-
-**Why Animation Events?**
-- Frame-perfect timing (VFX synced with visual impact)
-- No manual timing code needed
-- Artist can adjust timing in animation editor
+**Particle System:**
+- Duration: 0.3s, Self-destroying
+- 20 particles in circular burst
+- Fade-out animation (alpha 255→0)
+- Spawned via Animation Event at impact frame
 
 ---
 
 ### 5. Render Optimization
 
-**Draw Calls Breakdown:**
+#### UI Draw Calls (6 total):
+1. UI sprites (atlas batching)
+2. Mask stencil write
+3. Text rendering
+4. RawImage (RenderTexture)
+5. Mask stencil clear
+6. Border overlay (hides mask artifacts)
 
-| Element | Draw Calls | Reason |
-|---------|-----------|---------|
-| UI Sprites (Atlas) | 1 | Batched via Sprite Atlas |
-| Mask (Stencil Write) | 1 | Unity Mask component requirement |
-| Text (Buttons) | 1 | TextMeshPro |
-| RawImage (RenderTexture) | 1 | Dynamic texture (can't batch) |
-| Mask (Stencil Clear) | 1 | Unity Mask component requirement |
-| Border Overlay | 1 | Visual quality decision* |
-| **Total** | **6** | **Optimized** |
+**Design Decision:**
+The border is rendered as a separate draw call above the masked RawImage to hide mask edge artifacts and ensure clean rounded corners.
 
-**\*Design Decision: Border Overlay (+1 draw call)**
+#### Gameplay Draw Calls (3 total):
+1. Ground/background (Sorting Order 0)
+2. Character (Sorting Order 10)
+3. Grass/foreground (Sorting Order 20)
 
-The border is rendered as a separate draw call **above** the masked RawImage to hide mask edge artifacts and ensure clean rounded corners.
+**Design Decision:**
+Grass renders above character legs for correct depth. Different Sorting Orders prevent batching, but visual quality justifies the trade-off.
 
-**Trade-off Analysis:**
-- ✅ Clean visual quality (no aliasing/pixelation)
-- ✅ Professional appearance
-- ❌ +1 draw call
-
-**Alternative considered:** Merging border into atlas would save the call, but border must render *after* mask operations to properly hide artifacts. The visual improvement justifies the additional draw call.
-
-**Mask Component (2 draw calls unavoidable):**
-
-Unity's Mask component uses **stencil buffer** operations:
-1. Stencil Write - defines mask area
-2. Stencil Clear - cleanup after masked content
-
-This is a **hardware-level GPU operation** and cannot be batched. Alternative solutions (RectMask2D, custom shader) don't support rounded corners with the same visual quality.
+**Total: 9 draw calls**
 
 ---
 
-### Sprite Atlas Optimization (Level & Character)
+### 6. Sprite Atlas Configuration
 
-**Location Atlas Configuration:**
-```
-General Settings:
-├─ Include in Build: ON
-├─ Allow Rotation: ON
-├─ Tight Packing: ON
-└─ Padding: 4 pixels
+**Location Atlas:**
+- Max Size: 4096
+- Compression: Normal Quality, Crunch 50
+- Contains: ground, grass, decorations
+- Size: ~340 KB
 
-Platform Settings (Default):
-├─ Max Texture Size: 4096
-├─ Format: Automatic (Compressed)
-├─ Compression: Normal Quality
-└─ Crunch Compression: Quality 50
-```
-
-**Character Atlas Configuration:**
-```
-General Settings:
-├─ Include in Build: ON
-├─ Allow Rotation: ON
-├─ Tight Packing: ON
-└─ Padding: 4 pixels
-
-Platform Settings (Default):
-├─ Max Texture Size: 256
-├─ Format: Automatic (Compressed)
-├─ Compression: High Quality (character priority)
-└─ Crunch Compression: Quality 75
-```
+**Character Atlas:**
+- Max Size: 256
+- Compression: High Quality, Crunch 75
+- Contains: all knight sprites
+- Size: ~32 KB
 
 **Optimization Results:**
-- **Before**: 15-18 separate textures, ~12 MB memory, 15-20 draw calls
-- **After**: 2 sprite atlases, ~350 KB memory, **3 draw calls** 
-
-**Design Decision: 3 Draw Calls for Gameplay**
-
-The gameplay level uses 3 draw calls due to **Sorting Order** requirements:
-
-```
-Layer 0 (Ground): Sorting Order 0  → 1 draw call (Location Atlas)
-Layer 1 (Knight): Sorting Order 10 → 1 draw call (Character Atlas)
-Layer 2 (Grass):  Sorting Order 20 → 1 draw call (Location Atlas)
-```
-
-**Why 3 instead of 2?**
-- Grass must render **above** knight's legs for correct depth
-- Different Sorting Orders prevent batching (Unity limitation)
-- Alternative (Sprite Mask) would add +2 draw calls (worse: 2→4)
-
-**Trade-off Analysis:**
-- ✅ Correct visual depth layering (grass over legs)
-- ✅ Simple, maintainable scene hierarchy
-- ✅ No complex Z-position management
-- ❌ +1 draw call vs theoretical minimum
-
-**Conclusion:** 3 draw calls is the optimal balance between performance and visual correctness. Reducing to 2 would sacrifice depth realism or require more expensive solutions (masks, custom shaders).
-
----
-
-### 6. Code Architecture Decisions
-
-#### Why `Update()` for IdleAttack instead of Coroutine?
-
-**Current Implementation:**
-```csharp
-private void Update()
-{
-    if (Time.time >= _nextIdleAttackTime && IsIdle())
-    {
-        _animator.SetTrigger("IdleAttack");
-        ScheduleNextIdleAttack();
-    }
-}
-```
-
-**Rationale:**
-- ✅ **Performance**: Simple comparison (~0.001ms/frame) vs coroutine overhead
-- ✅ **Zero GC allocation**: Update doesn't create objects
-- ✅ **Precise timing**: Checked every frame (frame-accurate)
-
-**Coroutine Alternative:**
-```csharp
-// Would require:
-StartCoroutine(IdleAttackRoutine()); // IEnumerator allocation
-yield return new WaitForSeconds(X);  // Object allocation
-```
-
-**Conclusion:** Update is optimal for lightweight frame-by-frame checks. Coroutines are better for complex sequences with multiple delays.
+- Before: 15-18 textures, ~10+ MB, 15-30 draw calls
+- After: 2 atlases, ~350 KB, 3 draw calls
 
 ---
 
 ## Project Structure
 
 ```
-Assets/
-├── Animation/
-├── Resources/
+Assets/_ZiMAD/
+├── Animations/
+│   └── SwordMan.controller
+├── Prefabs/
+│   ├── Button.prefab
+│   └── sword_man Variant.prefab
 ├── Scripts/
-├── Scenes/
-├── Sprites/
-├── Shaders/
-└── _ZiMAD/
-    ├── Animations/
-    │   └── SwordMan.controller
-    │
-    ├── Prefabs/
-    │   ├── Button.prefab
-    │   └── sword_man Variant.prefab
-    │
-    ├── Scripts/
-    │   ├── EntryPoint.cs
-    │   ├── GameplayPresenter.cs
-    │   ├── GameplayView.cs
-    │   └── IdleAttack.cs
-    │
-    ├── Art/
-    │   ├── Materials/
-    │   ├── Textures/
-    │   ├── Sprites/
-    │   │   ├── Sources/      # Original sprites (16x16, 32x32)
-    │   │   └── Atlases/
-    │   │       └── GameplayView.spriteatlas
-    │
-    └── Scenes/
-       └── Gameplay.unity
-
+│   ├── EntryPoint.cs
+│   ├── GameplayPresenter.cs
+│   ├── GameplayView.cs
+│   └── IdleAttack.cs
+├── Art/
+│   ├── Materials/
+│   ├── Textures/
+│   └── Sprites/
+│       ├── Sources/
+│       └── Atlases/
+│           ├── GameplayView.spriteatlas
+│           ├── Location.spriteatlas
+│           └── Character.spriteatlas
+└── Scenes/
+    └── Gameplay.unity
 ```
 
 ---
@@ -373,41 +188,16 @@ Assets/
 ## Quick Start
 
 ```bash
-# 1. Clone repository
+# Clone repository
 git clone https://github.com/LLarean/zimad.git
 
-# 2. Open in Unity 6000.0.x
+# Open in Unity 6000.0.x
 
-# 3. Open scene: _ZiMAD/Scenes/Gameplay.unity
-
-# 4. Press Play
+# Play: _ZiMAD/Scenes/Gameplay.unity
 ```
 
 ---
 
-## Performance Results (UI)
-
-| Metric                   | Target | Achieved    |
-|--------------------------|--------|-------------|
-| Draw Calls (UI)          | < 15   | **6**       |
-| Draw Calls (Game)        | < 15   | **3**       |
-| Sprite Atlas Size (UI)   | - | **2.2 KB**  |
-| Sprite Atlas Size (Game) | - | **~350 KB** |
-
-**Test Environment:** Unity 6000.0.58, Built-in Pipeline, 1920x1080
-
----
-
-## Technologies
-
-- **Unity** 6000.0.58 LTS
-- **C#** .NET Standard 2.1
-- **Built-in Render Pipeline**
-- **Sprite Atlas** - Crunch compression
-- **Animation Events** - VFX timing
-- **RenderTexture** - Camera-to-UI system
-
----
 
 ## Author
 
@@ -419,6 +209,5 @@ Email: llarean@yandex.com
 
 ## Credits
 
-- **Provided by ZiMAD**: All graphic assets, core scripts (PlayerController, shaders)
-- **Implementation & Optimization**: LLarean (UI system, animation controller, VFX, performance optimization)
-- **Technical Test**: ZimAD
+- **Assets & Base Scripts**: ZiMAD
+- **Implementation & Optimization**: LLarean
