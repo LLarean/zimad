@@ -24,6 +24,11 @@
 ### WebGL Build
 [Play in Browser](#) *(coming soon)*
 
+**System Requirements:**
+- Modern browser with WebGL support
+- Recommended: Chrome, Firefox, Edge
+- Stable internet connection
+
 ---
 
 ## Screenshots
@@ -325,7 +330,7 @@ git clone https://github.com/LLarean/zimad.git
 |-------------------|--------|-------------|
 | Draw Calls    | < 15   | **6**       |
 | Batches       | < 20   | **6**       |
-| Sprite Atlas Size | - | **2.2 KB** (optimized source) |
+| Sprite Atlas Size | - | **2.2 KB**  |
 
 **Test Environment:** Unity 6000.0.58, Built-in Pipeline, 1920x1080
 
