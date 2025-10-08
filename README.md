@@ -48,7 +48,7 @@
     </td>
     <td width="50%">
       <img src="https://github.com/LLarean/zimad/blob/main/Screenshots/DrawCalls.jpg?raw=true" alt="Optimization"/>
-      <p align="center"><em>Frame Debugger (9 Draw Calls)</em></p>
+      <p align="center"><em>Frame Debugger</em></p>
     </td>
   </tr>
 </table>
